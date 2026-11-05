@@ -1,0 +1,28 @@
+---
+import Base from '../layouts/Base.astro';
+import { withBase } from '../lib/site';
+---
+
+<Base title="ページが見つかりません">
+  <section class="container">
+    <p class="mono code">404</p>
+    <h1>ページが見つかりません</h1>
+    <p><a href={withBase('/')}>トップへ戻る</a></p>
+  </section>
+</Base>
+
+<style>
+  section {
+    padding-top: 80px;
+  }
+
+  .code {
+    margin: 0;
+    color: var(--brand);
+  }
+
+  h1 {
+    margin: 4px 0 16px;
+    font-size: 1.6rem;
+  }
+</style>

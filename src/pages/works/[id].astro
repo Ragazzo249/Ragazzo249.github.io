@@ -1,0 +1,137 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Cover from '../../components/Cover.astro';
+import { formatMonth, withBase } from '../../lib/site';
+
+export const getStaticPaths = (async () => {
+  const works = await getCollection('works', ({ data }) => !data.draft);
+  return works.map((work) => ({ params: { id: work.id }, props: { work } }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  work: CollectionEntry<'works'>;
+}
+
+const { work } = Astro.props;
+const { title, summary, started, status, tags, accent, links } = work.data;
+const { Content } = await render(work);
+---
+
+<Base title={title} description={summary}>
+  <div class="cover-band">
+    <Cover seed={work.id} accent={accent} cols={24} rows={5} />
+  </div>
+
+  <article class="container">
+    <a class="back" href={withBase('/#works')}>← 作品一覧</a>
+
+    <header>
+      <h1>{title}</h1>
+      <p class="summary">{summary}</p>
+    </header>
+
+    <dl class="facts">
+      <div>
+        <dt>状態</dt>
+        <dd><span class="status" data-status={status}>{status}</span></dd>
+      </div>
+      <div>
+        <dt>開始</dt>
+        <dd>{formatMonth(started)}</dd>
+      </div>
+      <div class="wide">
+        <dt>使ったもの</dt>
+        <dd>
+          <ul class="tags">
+            {tags.map((tag) => <li>{tag}</li>)}
+          </ul>
+        </dd>
+      </div>
+      {
+        links.length > 0 && (
+          <div class="wide">
+            <dt>リンク</dt>
+            <dd class="links">
+              {links.map((link) => (
+                <a href={link.href}>{link.label} ↗</a>
+              ))}
+            </dd>
+          </div>
+        )
+      }
+    </dl>
+
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</Base>
+
+<style>
+  .cover-band {
+    height: clamp(90px, 16vw, 160px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .back {
+    display: inline-block;
+    margin-top: 28px;
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+
+  .back:hover {
+    color: var(--text);
+  }
+
+  header {
+    margin: 20px 0 28px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(1.7rem, 5vw, 2.4rem);
+    line-height: 1.35;
+  }
+
+  .summary {
+    max-width: 40em;
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 1.05rem;
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px 24px;
+    margin: 0 0 8px;
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+  }
+
+  .facts .wide {
+    grid-column: 1 / -1;
+  }
+
+  dt {
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+</style>

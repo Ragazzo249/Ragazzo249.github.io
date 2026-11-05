@@ -1,0 +1,75 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import WorkCard from '../components/WorkCard.astro';
+import { SITE } from '../lib/site';
+
+const works = (await getCollection('works', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.order - a.data.order || b.data.started.getTime() - a.data.started.getTime(),
+);
+---
+
+<Base>
+  <section class="hero container">
+    <p class="mono eyebrow">works / {works.length}</p>
+    <h1>作ったものを、<br />置いておく場所。</h1>
+    <p class="lead">{SITE.description}</p>
+  </section>
+
+  <section id="works" class="container">
+    <h2 class="section-title">作品</h2>
+    {
+      works.length > 0 ? (
+        <div class="grid">
+          {works.map((work) => (
+            <WorkCard work={work} />
+          ))}
+        </div>
+      ) : (
+        <p class="empty">まだ作品がありません。</p>
+      )
+    }
+  </section>
+</Base>
+
+<style>
+  .hero {
+    padding-top: 72px;
+    padding-bottom: 56px;
+  }
+
+  .eyebrow {
+    margin: 0 0 12px;
+    color: var(--brand);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(1.9rem, 6vw, 2.8rem);
+    line-height: 1.35;
+    letter-spacing: 0.02em;
+  }
+
+  .lead {
+    max-width: 40em;
+    margin: 20px 0 0;
+    color: var(--muted);
+  }
+
+  .section-title {
+    margin: 0 0 20px;
+    font-size: 0.95rem;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: 20px;
+  }
+
+  .empty {
+    color: var(--muted);
+  }
+</style>

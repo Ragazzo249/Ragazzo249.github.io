@@ -1,0 +1,117 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Cover from './Cover.astro';
+import { formatMonth, withBase } from '../lib/site';
+
+interface Props {
+  work: CollectionEntry<'works'>;
+}
+
+const { work } = Astro.props;
+const { title, summary, started, status, tags, accent } = work.data;
+---
+
+<article class="card">
+  <div class="cover-wrap">
+    <Cover seed={work.id} accent={accent} />
+  </div>
+  <div class="body">
+    <div class="meta">
+      <span class="status" data-status={status}>{status}</span>
+      <span class="mono">{formatMonth(started)}〜</span>
+    </div>
+    <h3>
+      <a href={withBase(`/works/${work.id}/`)}>{title}</a>
+    </h3>
+    <p>{summary}</p>
+    <ul class="tags">
+      {tags.map((tag) => <li>{tag}</li>)}
+    </ul>
+  </div>
+</article>
+
+<style>
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    transition:
+      border-color 0.15s,
+      transform 0.15s;
+  }
+
+  .card:hover {
+    border-color: var(--brand);
+    transform: translateY(-2px);
+  }
+
+  .card:focus-within {
+    border-color: var(--brand);
+  }
+
+  .cover-wrap {
+    aspect-ratio: 12 / 5;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px 20px 20px;
+  }
+
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    line-height: 1.4;
+  }
+
+  /* カード全体をクリックできるようにする */
+  h3 a {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  h3 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  h3 a:focus-visible {
+    outline: none;
+  }
+
+  p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .tags {
+    margin-top: auto;
+    padding-top: 8px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card {
+      transition: none;
+    }
+
+    .card:hover {
+      transform: none;
+    }
+  }
+</style>
