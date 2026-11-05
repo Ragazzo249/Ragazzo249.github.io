@@ -36,6 +36,17 @@ const works = await getCollection('works', ({ data }) => !data.draft);
     <script is:inline>
       document.documentElement.classList.add('js');
     </script>
+    {
+      /* Cloudflare Web Analytics。開発中のアクセスを数えないよう本番ビルドだけに入れる */
+      import.meta.env.PROD && (
+        <script
+          is:inline
+          type="module"
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({ token: SITE.cfBeaconToken })}
+        />
+      )
+    }
   </head>
   <body>
     <div class="guides" aria-hidden="true">

@@ -3,6 +3,8 @@ export const SITE = {
   title: 'Ragazzo249 の作品置き場',
   description: 'Minecraft のサーバーやツール、ちょっとした実験など、作ったものを並べています。',
   github: 'https://github.com/Ragazzo249',
+  // Cloudflare Web Analytics のサイトトークン。ページに埋め込まれる公開の値で、秘密ではない
+  cfBeaconToken: '79d8db3d1954406bbb9076a3363f3347',
 };
 
 /** base を付けたサイト内のパスを返す(GitHub Pages のサブパス公開に対応するため) */
