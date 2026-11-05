@@ -1,6 +1,6 @@
 export const SITE = {
   name: 'Ragazzo249',
-  title: 'Ragazzo249 の作品置き場',
+  title: 'Ragazzo249PF',
   description: 'Minecraft のサーバーやツール、ちょっとした実験など、作ったものを並べています。',
   github: 'https://github.com/Ragazzo249',
   // Cloudflare Web Analytics のサイトトークン。ページに埋め込まれる公開の値で、秘密ではない

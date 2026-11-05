@@ -1,0 +1,119 @@
+---
+// 自己紹介。文章は src/content/about.md に書く(draft: true の間は表示しない)
+import { Content, frontmatter } from '../content/about.md';
+
+interface AboutData {
+  name: string;
+  role?: string;
+  statement?: string;
+  links?: { label: string; href: string }[];
+  draft?: boolean;
+}
+
+const about = frontmatter as AboutData;
+---
+
+{
+  !about.draft && (
+    <section id="about" class="sec tone-light about">
+      <div class="container sec-inner">
+        <p class="sec-label">自己紹介</p>
+        <div class="grid">
+          <header>
+            <h2 class="display" data-reveal>About</h2>
+            {about.statement && <p class="statement">{about.statement}</p>}
+          </header>
+          <div class="text">
+            <p class="name mincho" data-reveal>{about.name}</p>
+            {about.role && <p class="role">{about.role}</p>}
+            <div class="prose body">
+              <Content />
+            </div>
+            {about.links && about.links.length > 0 && (
+              <ul class="links label">
+                {about.links.map((link) => (
+                  <li>
+                    <a href={link.href}>{link.label} ↗</a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .about {
+    padding: 120px 0 140px;
+  }
+
+  .grid {
+    display: grid;
+    gap: 56px;
+  }
+
+  /* PC では見出しを左、本文を右に置き、左右非対称にする */
+  @media (min-width: 820px) {
+    .grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      gap: 48px;
+    }
+  }
+
+  h2 {
+    margin: 0;
+    font-size: clamp(48px, 10vw, 140px);
+  }
+
+  .statement {
+    margin: 20px 0 0;
+    color: var(--sub);
+    font-family: var(--font-display);
+    font-size: clamp(18px, 2.4vw, 26px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+  }
+
+  .name {
+    margin: 0;
+    font-size: clamp(24px, 3.4vw, 34px);
+    line-height: 1.4;
+  }
+
+  .role {
+    margin: 8px 0 0;
+    color: var(--sub);
+  }
+
+  .body {
+    margin-top: 32px;
+  }
+
+  /* 書いたとおりに改行する(Markdown の 1 回の改行も、表示上の改行にする) */
+  .body :global(p) {
+    margin: 0 0 1.2em;
+    white-space: pre-line;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 28px;
+    margin: 40px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .links a {
+    text-decoration: none;
+  }
+
+  .links a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+</style>

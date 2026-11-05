@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import { getCollection } from 'astro:content';
 import { SITE, withBase } from '../lib/site';
+import { frontmatter as aboutFrontmatter } from '../content/about.md';
 
 interface Props {
   title?: string;
@@ -12,6 +13,8 @@ const { title, description = SITE.description } = Astro.props;
 const pageTitle = title ? `${title} | ${SITE.title}` : SITE.title;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const works = await getCollection('works', ({ data }) => !data.draft);
+// 自己紹介が下書きの間は、ナビにも出さない
+const aboutDraft = Boolean(aboutFrontmatter.draft);
 ---
 
 <!doctype html>
@@ -55,9 +58,10 @@ const works = await getCollection('works', ({ data }) => !data.draft);
 
     <header class="site-header tone-light">
       <div class="container inner">
-        <a class="brand display" href={withBase('/')}>{SITE.name}</a>
+        <a class="brand display" href={withBase('/')}>{SITE.title}</a>
         <nav class="label">
           <a href={withBase('/#works')}>Works</a>
+          {!aboutDraft && <a href={withBase('/#about')}>About</a>}
           <a href={SITE.github} rel="me">GitHub</a>
         </nav>
       </div>

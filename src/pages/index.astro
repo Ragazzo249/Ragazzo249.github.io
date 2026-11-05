@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import WorkCard from '../components/WorkCard.astro';
+import About from '../components/About.astro';
 import { SITE } from '../lib/site';
 
 const works = (await getCollection('works', ({ data }) => !data.draft)).sort(
@@ -17,9 +18,9 @@ const wall = Array.from({ length: 6 }, () => words.join(' ')).join(' ');
   <section class="sec tone-light hero">
     <div class="container sec-inner">
       <p class="sec-label">はじめに</p>
-      <div>
+      <div class="hero-text">
         <h1 class="display" data-reveal>
-          Things<br />I made,<br />kept here.
+          Ragazzo249<br />PortFolio
         </h1>
         <p class="copy mincho" data-reveal>作ったものを、置いておく場所。</p>
         <p class="lead" data-reveal>{SITE.description}</p>
@@ -50,6 +51,8 @@ const wall = Array.from({ length: 6 }, () => words.join(' ')).join(' ');
       </div>
     </div>
   </section>
+
+  <About />
 </Base>
 
 <style>
@@ -57,9 +60,19 @@ const wall = Array.from({ length: 6 }, () => words.join(' ')).join(' ');
     padding: 120px 0 160px;
   }
 
+  /* 見出しの文字サイズを、この枠の幅から決める */
+  .hero-text {
+    container-type: inline-size;
+  }
+
+  /*
+   * 「Ragazzo249」の幅は文字サイズの約 5.55 倍(Inter Tight 900)。
+   * 17.5cqi にすると枠幅の約 97% に収まり、途中で折り返さない
+   */
   h1 {
     margin: 0;
-    font-size: clamp(56px, 15vw, 200px);
+    font-size: 17.5cqi;
+    overflow-wrap: normal;
   }
 
   .copy {
