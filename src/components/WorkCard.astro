@@ -1,86 +1,58 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import Cover from './Cover.astro';
-import { formatMonth, withBase } from '../lib/site';
+import { formatStamp, withBase } from '../lib/site';
 
 interface Props {
   work: CollectionEntry<'works'>;
 }
 
 const { work } = Astro.props;
-const { title, summary, started, status, tags, accent } = work.data;
+const { title, statement, summary, started, status, tags } = work.data;
 ---
 
-<article class="card">
-  <div class="cover-wrap">
-    <Cover seed={work.id} accent={accent} />
-  </div>
-  <div class="body">
-    <div class="meta">
-      <span class="status" data-status={status}>{status}</span>
-      <span class="mono">{formatMonth(started)}〜</span>
-    </div>
-    <h3>
-      <a href={withBase(`/works/${work.id}/`)}>{title}</a>
-    </h3>
-    <p>{summary}</p>
-    <ul class="tags">
-      {tags.map((tag) => <li>{tag}</li>)}
-    </ul>
-  </div>
+<article class="row" data-reveal>
+  <p class="meta label">
+    <span>WORK_{formatStamp(started)}</span>
+    <span class="status" data-status={status}>{status}</span>
+  </p>
+  <h3 class="display">
+    <a href={withBase(`/works/${work.id}/`)}>{title}</a>
+  </h3>
+  {statement && <p class="statement">{statement}</p>}
+  <p class="summary mincho">{summary}</p>
+  <ul class="tags">
+    {tags.map((tag) => <li>{tag}</li>)}
+  </ul>
+  <span class="arrow display" aria-hidden="true">→</span>
 </article>
 
 <style>
-  .card {
+  .row {
     position: relative;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    background: var(--surface);
-    transition:
-      border-color 0.15s,
-      transform 0.15s;
+    display: grid;
+    gap: 14px;
+    padding: 40px 0 44px;
+    border-top: 1px solid var(--rule);
   }
 
-  .card:hover {
-    border-color: var(--brand);
-    transform: translateY(-2px);
-  }
-
-  .card:focus-within {
-    border-color: var(--brand);
-  }
-
-  .cover-wrap {
-    aspect-ratio: 12 / 5;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .body {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    gap: 8px;
-    padding: 16px 20px 20px;
+  .row:last-child {
+    border-bottom: 1px solid var(--rule);
   }
 
   .meta {
     display: flex;
-    justify-content: space-between;
-    color: var(--muted);
+    gap: 24px;
+    margin: 0;
+    color: var(--sub);
   }
 
   h3 {
     margin: 0;
-    font-size: 1.2rem;
-    line-height: 1.4;
+    font-size: clamp(44px, 9vw, 112px);
   }
 
-  /* カード全体をクリックできるようにする */
+  /* 行全体をクリックできるようにする */
   h3 a {
-    color: var(--text);
     text-decoration: none;
   }
 
@@ -90,28 +62,49 @@ const { title, summary, started, status, tags, accent } = work.data;
     inset: 0;
   }
 
+  .statement {
+    margin: 0;
+    color: var(--sub);
+    font-family: var(--font-display);
+    font-size: clamp(18px, 2.4vw, 26px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+  }
+
+  .summary {
+    max-width: 34em;
+    margin: 8px 0 0;
+    font-size: 15px;
+    line-height: 2.1;
+  }
+
+  .arrow {
+    position: absolute;
+    top: 40px;
+    right: 0;
+    font-size: clamp(28px, 4vw, 44px);
+    transition: transform 0.6s var(--ease-out);
+  }
+
+  .row:hover .arrow,
+  .row:focus-within .arrow {
+    transform: translateX(10px);
+  }
+
+  .row:focus-within h3 a {
+    text-decoration: underline;
+    text-decoration-thickness: 4px;
+    text-underline-offset: 8px;
+  }
+
   h3 a:focus-visible {
     outline: none;
   }
 
-  p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.95rem;
-  }
-
-  .tags {
-    margin-top: auto;
-    padding-top: 8px;
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    .card {
+    .arrow {
       transition: none;
-    }
-
-    .card:hover {
-      transform: none;
     }
   }
 </style>

@@ -7,69 +7,97 @@ import { SITE } from '../lib/site';
 const works = (await getCollection('works', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.order - a.data.order || b.data.started.getTime() - a.data.started.getTime(),
 );
+
+// 作品名と技術名を敷き詰めて、黒い面の模様にする
+const words = [...new Set(works.flatMap((w) => [w.data.title, ...w.data.tags]))];
+const wall = Array.from({ length: 6 }, () => words.join(' ')).join(' ');
 ---
 
 <Base>
-  <section class="hero container">
-    <p class="mono eyebrow">works / {works.length}</p>
-    <h1>作ったものを、<br />置いておく場所。</h1>
-    <p class="lead">{SITE.description}</p>
+  <section class="sec tone-light hero">
+    <div class="container sec-inner">
+      <p class="sec-label">はじめに</p>
+      <div>
+        <h1 class="display" data-reveal>
+          Things<br />I made,<br />kept here.
+        </h1>
+        <p class="copy mincho" data-reveal>作ったものを、置いておく場所。</p>
+        <p class="lead" data-reveal>{SITE.description}</p>
+      </div>
+    </div>
   </section>
 
-  <section id="works" class="container">
-    <h2 class="section-title">作品</h2>
-    {
-      works.length > 0 ? (
-        <div class="grid">
-          {works.map((work) => (
-            <WorkCard work={work} />
-          ))}
-        </div>
-      ) : (
-        <p class="empty">まだ作品がありません。</p>
-      )
-    }
+  <section id="works" class="sec tone-dark works">
+    <p class="wall" aria-hidden="true">{wall}</p>
+    <div class="container sec-inner">
+      <p class="sec-label">作品</p>
+      <div class="body">
+        <header class="works-head">
+          <h2 class="display" data-reveal>Works</h2>
+          <p class="count label">{String(works.length).padStart(2, '0')} items</p>
+        </header>
+        {
+          works.length > 0 ? (
+            <div class="list">
+              {works.map((work) => (
+                <WorkCard work={work} />
+              ))}
+            </div>
+          ) : (
+            <p class="mincho">まだ作品がありません。</p>
+          )
+        }
+      </div>
+    </div>
   </section>
 </Base>
 
 <style>
   .hero {
-    padding-top: 72px;
-    padding-bottom: 56px;
-  }
-
-  .eyebrow {
-    margin: 0 0 12px;
-    color: var(--brand);
+    padding: 120px 0 160px;
   }
 
   h1 {
     margin: 0;
-    font-size: clamp(1.9rem, 6vw, 2.8rem);
-    line-height: 1.35;
-    letter-spacing: 0.02em;
+    font-size: clamp(56px, 15vw, 200px);
+  }
+
+  .copy {
+    margin: 64px 0 0;
+    font-size: clamp(20px, 3.2vw, 30px);
+    line-height: 1.7;
   }
 
   .lead {
-    max-width: 40em;
+    max-width: 30em;
     margin: 20px 0 0;
-    color: var(--muted);
+    color: var(--sub);
   }
 
-  .section-title {
-    margin: 0 0 20px;
-    font-size: 0.95rem;
-    color: var(--muted);
-    font-weight: 400;
+  .works {
+    overflow: hidden;
+    padding: 120px 0 140px;
   }
 
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
-    gap: 20px;
+  .body {
+    position: relative;
   }
 
-  .empty {
-    color: var(--muted);
+  .works-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 56px;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: clamp(48px, 10vw, 140px);
+  }
+
+  .count {
+    margin: 0;
+    color: var(--sub);
   }
 </style>

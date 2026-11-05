@@ -1,29 +1,49 @@
+/*
+ * デザインの方針
+ * - 色は黒・白・グレーだけ。セクションごとに白と黒を反転させて章を区切る
+ * - 書体は役割で分ける: 明朝 = 情緒的な日本語 / Display = 英語の宣言 / ゴシック = 情報
+ * - 薄い縦の補助線を全体に通し、本文は左寄せで余白を大きく取る
+ */
 :root {
-  --bg: #f6f4ee;
-  --surface: #fffdf8;
-  --text: #22251f;
-  --muted: #6b6e64;
-  --line: #e2ded2;
-  --brand: #4f7a30;
-  --brand-soft: #e6eedb;
-  --radius: 10px;
-  --max: 960px;
-  --font-sans: 'Zen Kaku Gothic New', system-ui, -apple-system, 'Hiragino Sans', 'Yu Gothic UI', sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
-  color-scheme: light;
+  --white: #ffffff;
+  --black: #0a0a0a;
+  --font-mincho: 'Zen Old Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+  --font-display: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
+  --font-gothic: 'Inter Tight', 'Zen Kaku Gothic New', system-ui, 'Hiragino Sans', 'Yu Gothic UI', sans-serif;
+  --ease-out: cubic-bezier(0.33, 1, 0.68, 1); /* easeOutCubic */
+  --max: 1200px;
+  --gutter: 16px;
+  --rail: 0px;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (min-width: 820px) {
   :root {
-    --bg: #181a16;
-    --surface: #20231e;
-    --text: #e8e9e3;
-    --muted: #a0a397;
-    --line: #33372f;
-    --brand: #9bc472;
-    --brand-soft: #2a3423;
-    color-scheme: dark;
+    --gutter: 48px;
+    --rail: 56px;
   }
+}
+
+/* セクションの白黒。中の要素は --bg / --fg / --sub / --rule だけを使う */
+.tone-light {
+  --bg: var(--white);
+  --fg: var(--black);
+  --sub: #8c8c8c;
+  --rule: #e4e4e4;
+  --wall: rgba(0, 0, 0, 0.05);
+}
+
+.tone-dark {
+  --bg: var(--black);
+  --fg: var(--white);
+  --sub: #8a8a8a;
+  --rule: #2a2a2a;
+  --wall: rgba(255, 255, 255, 0.045);
+}
+
+.tone-light,
+.tone-dark {
+  background: var(--bg);
+  color: var(--fg);
 }
 
 *,
@@ -34,139 +54,259 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  color-scheme: light;
 }
 
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-sans);
-  font-size: 16px;
-  line-height: 1.8;
+  background: var(--white);
+  color: var(--black);
+  font-family: var(--font-gothic);
+  font-size: 15px;
+  line-height: 1.9;
+  font-feature-settings: 'palt';
   overflow-wrap: anywhere;
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
-  color: var(--brand);
-  text-underline-offset: 3px;
-}
-
-a:hover {
-  text-decoration-thickness: 2px;
+  color: inherit;
 }
 
 :focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: 3px;
-  border-radius: 4px;
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+/* 縦の補助線。白でも黒でも見えるよう中間のグレーを薄く重ねる */
+.guides {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.guides .container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  height: 100%;
+}
+
+.guides span {
+  border-left: 1px solid rgba(128, 128, 128, 0.16);
+}
+
+.guides span:last-child {
+  border-right: 1px solid rgba(128, 128, 128, 0.16);
+}
+
+@media (max-width: 819px) {
+  .guides .container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .guides span:nth-child(n + 3) {
+    display: none;
+  }
+
+  .guides span:nth-child(2) {
+    border-right: 1px solid rgba(128, 128, 128, 0.16);
+  }
 }
 
 .container {
   width: 100%;
   max-width: var(--max);
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 var(--gutter);
 }
 
-.mono {
-  font-family: var(--font-mono);
-  font-size: 0.85em;
-  letter-spacing: 0.01em;
+/* 左のレールに章の名前を縦書きで置く(PC のみ) */
+.sec {
+  position: relative;
+}
+
+.sec-label {
+  display: none;
+}
+
+/* レールの列は PC だけ。スマホでは本文だけの 1 列にする */
+@media (min-width: 820px) {
+  .sec-inner {
+    display: grid;
+    grid-template-columns: var(--rail) minmax(0, 1fr);
+  }
+
+  .sec-label {
+    display: block;
+    position: sticky;
+    top: 32px;
+    align-self: start;
+    margin: 0;
+    color: var(--sub);
+    font-family: var(--font-mincho);
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    writing-mode: vertical-rl;
+  }
+}
+
+/* 書体の役割 */
+.display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  letter-spacing: -0.055em;
+  word-spacing: 0.08em;
+  line-height: 0.9;
+}
+
+.mincho {
+  font-family: var(--font-mincho);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+}
+
+.label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px 18px;
   margin: 0;
   padding: 0;
   list-style: none;
+  color: var(--sub);
+  font-size: 12px;
+  letter-spacing: 0.04em;
 }
 
-.tags li {
-  padding: 1px 10px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--muted);
-  font-size: 0.8rem;
-}
-
-.status {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-
+/* 運用中・公開中は塗りの丸、それ以外は白抜きの丸。色は使わない */
 .status::before {
-  content: '';
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--status-color, var(--muted));
+  content: '○';
+  margin-right: 0.5em;
 }
 
-.status[data-status='運用中'],
-.status[data-status='公開中'] {
-  --status-color: #4caf50;
+.status[data-status='運用中']::before,
+.status[data-status='公開中']::before {
+  content: '●';
 }
 
-.status[data-status='開発中'] {
-  --status-color: #e0a526;
+/* 文字を敷き詰めた壁。作品名や技術名そのものを模様として使う */
+.wall {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  margin: 0;
+  color: var(--wall);
+  font-family: var(--font-display);
+  font-size: clamp(48px, 9vw, 128px);
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 0.92;
+  text-transform: uppercase;
+  word-spacing: 0.15em;
+  pointer-events: none;
+  user-select: none;
+  /* 下に向かって消し、セクションの端で文字が切れて見えないようにする */
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 35%, transparent 85%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 35%, transparent 85%);
 }
 
-/* 作品ページの本文(Markdown) */
+/* スクロールに合わせて、グレーから本来の色へ濃くなる(JS が有効な時だけ) */
+.js [data-reveal] {
+  transition:
+    color 1.2s var(--ease-out),
+    opacity 1.2s var(--ease-out),
+    transform 1.2s var(--ease-out);
+}
+
+.js [data-reveal]:not(.is-in) {
+  color: var(--sub);
+  opacity: 0.35;
+  transform: translateY(12px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal],
+  .js [data-reveal]:not(.is-in) {
+    transition: none;
+    color: inherit;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 作品ページの本文(Markdown)。情報の文章なのでゴシック */
 .prose {
-  max-width: 68ch;
+  max-width: 40em;
 }
 
 .prose h2 {
-  margin: 2.4em 0 0.6em;
-  padding-bottom: 0.3em;
-  border-bottom: 1px solid var(--line);
-  font-size: 1.25rem;
+  margin: 4.5em 0 1.2em;
+  font-size: 20px;
+  font-weight: 700;
   line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+
+.prose h2::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 2px;
+  margin-bottom: 18px;
+  background: currentColor;
 }
 
 .prose h3 {
-  margin: 1.8em 0 0.4em;
-  font-size: 1.05rem;
+  margin: 2em 0 0.5em;
+  font-size: 16px;
 }
 
 .prose ul,
 .prose ol {
-  padding-left: 1.4em;
+  padding-left: 1.3em;
 }
 
 .prose li + li {
-  margin-top: 0.25em;
+  margin-top: 0.4em;
+}
+
+.prose strong {
+  font-weight: 700;
 }
 
 .prose code {
-  padding: 0.1em 0.4em;
-  border-radius: 4px;
-  background: var(--brand-soft);
-  font-family: var(--font-mono);
-  font-size: 0.88em;
+  padding: 0.1em 0.35em;
+  background: #f0f0f0;
+  font-size: 0.9em;
 }
 
 .prose table {
   display: block;
   max-width: 100%;
   overflow-x: auto;
+  margin: 1.5em 0;
   border-collapse: collapse;
-  font-size: 0.92rem;
+  font-size: 14px;
 }
 
 .prose th,
 .prose td {
-  padding: 6px 12px;
-  border-bottom: 1px solid var(--line);
+  padding: 10px 32px 10px 0;
+  border-bottom: 1px solid var(--rule);
   text-align: left;
   vertical-align: top;
 }
 
 .prose th {
+  color: var(--sub);
+  font-weight: 400;
   white-space: nowrap;
 }

@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { getCollection } from 'astro:content';
 import { SITE, withBase } from '../lib/site';
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 const { title, description = SITE.description } = Astro.props;
 const pageTitle = title ? `${title} | ${SITE.title}` : SITE.title;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const works = await getCollection('works', ({ data }) => !data.draft);
 ---
 
 <!doctype html>
@@ -29,18 +31,22 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;700;900&family=Zen+Kaku+Gothic+New:wght@400;700&family=Zen+Old+Mincho:wght@400;700&display=swap"
     />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
   </head>
   <body>
-    <header class="site-header">
+    <div class="guides" aria-hidden="true">
+      <div class="container"><span></span><span></span><span></span><span></span></div>
+    </div>
+
+    <header class="site-header tone-light">
       <div class="container inner">
-        <a class="brand" href={withBase('/')}>
-          <img src={withBase('favicon.svg')} alt="" width="22" height="22" />
-          <span>{SITE.name}</span>
-        </a>
-        <nav>
-          <a href={withBase('/#works')}>作品</a>
+        <a class="brand display" href={withBase('/')}>{SITE.name}</a>
+        <nav class="label">
+          <a href={withBase('/#works')}>Works</a>
           <a href={SITE.github} rel="me">GitHub</a>
         </nav>
       </div>
@@ -50,59 +56,125 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       <slot />
     </main>
 
-    <footer class="site-footer">
+    <footer class="site-footer tone-dark">
       <div class="container">
-        <small>© {new Date().getFullYear()} {SITE.name}</small>
+        <p class="closing mincho">ひとつずつ作って、ここに並べていく。</p>
+        <div class="cols">
+          <div>
+            <p class="label">Works</p>
+            <ul>
+              {
+                works.map((work) => (
+                  <li>
+                    <a href={withBase(`/works/${work.id}/`)}>{work.data.title}</a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+          <div>
+            <p class="label">Elsewhere</p>
+            <ul>
+              <li><a href={SITE.github} rel="me">GitHub ↗</a></li>
+            </ul>
+          </div>
+        </div>
+        <p class="copy label">© {new Date().getFullYear()} {SITE.name}</p>
       </div>
     </footer>
+
+    <script>
+      // [data-reveal] が画面に入ったら .is-in を付ける(一度だけ)
+      const targets = document.querySelectorAll('[data-reveal]');
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            entry.target.classList.add('is-in');
+            io.unobserve(entry.target);
+          }
+        },
+        { rootMargin: '0px 0px -10% 0px' },
+      );
+      targets.forEach((el) => io.observe(el));
+    </script>
   </body>
 </html>
 
 <style>
-  .site-header {
-    border-bottom: 1px solid var(--line);
-  }
-
   .inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    min-height: 60px;
+    min-height: 72px;
   }
 
   .brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--text);
-    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.04em;
     text-decoration: none;
   }
 
   nav {
     display: flex;
-    gap: 20px;
-    font-size: 0.92rem;
+    gap: 28px;
   }
 
   nav a {
-    color: var(--muted);
     text-decoration: none;
   }
 
   nav a:hover {
-    color: var(--text);
-  }
-
-  main {
-    min-height: calc(100vh - 140px);
+    text-decoration: underline;
+    text-underline-offset: 4px;
   }
 
   .site-footer {
-    margin-top: 80px;
-    padding: 24px 0;
-    border-top: 1px solid var(--line);
-    color: var(--muted);
+    padding: 96px 0 32px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .closing {
+    margin: 0 0 72px;
+    font-size: clamp(16px, 3vw, 24px);
+  }
+
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px;
+  }
+
+  @media (min-width: 820px) {
+    .cols {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .cols .label {
+    margin: 0 0 12px;
+    color: var(--sub);
+  }
+
+  .cols ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--font-mincho);
+  }
+
+  .cols a {
+    text-decoration: none;
+  }
+
+  .cols a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  .copy {
+    margin: 96px 0 0;
+    color: var(--sub);
   }
 </style>

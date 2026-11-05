@@ -11,6 +11,11 @@ export function withBase(path: string): string {
   return `${base}/${path.replace(/^\//, '')}`;
 }
 
+/** 2026.10 のような表記(作品の種別ラベル用) */
+export function formatStamp(date: Date): string {
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
 export function formatMonth(date: Date): string {
   return `${date.getFullYear()}年${date.getMonth() + 1}月`;
 }

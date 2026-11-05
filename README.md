@@ -18,11 +18,11 @@ npm run preview  # ビルド結果を確認
 ```md
 ---
 title: 作品名
+statement: Short English line.   # 任意。英語のひとこと
 summary: 一覧のカードに出す一文
 started: 2026-11-01
 status: 開発中        # 運用中 / 開発中 / 公開中 / 完了 / 休止
 tags: [TypeScript, Astro]
-accent: '#3a6f8f'     # カバー模様の色
 links:
   - { label: GitHub, href: https://github.com/... }
 order: 0              # 大きいほど上に出る

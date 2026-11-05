@@ -4,25 +4,29 @@ import { withBase } from '../lib/site';
 ---
 
 <Base title="ページが見つかりません">
-  <section class="container">
-    <p class="mono code">404</p>
-    <h1>ページが見つかりません</h1>
-    <p><a href={withBase('/')}>トップへ戻る</a></p>
+  <section class="sec tone-light">
+    <div class="container sec-inner">
+      <p class="sec-label">迷子</p>
+      <div>
+        <h1 class="display">Not<br />found.</h1>
+        <p class="mincho">お探しのページは見つかりませんでした。</p>
+        <p class="label"><a href={withBase('/')}>← Back to top</a></p>
+      </div>
+    </div>
   </section>
 </Base>
 
 <style>
   section {
-    padding-top: 80px;
-  }
-
-  .code {
-    margin: 0;
-    color: var(--brand);
+    padding: 120px 0 160px;
   }
 
   h1 {
-    margin: 4px 0 16px;
-    font-size: 1.6rem;
+    margin: 0 0 48px;
+    font-size: clamp(56px, 15vw, 200px);
+  }
+
+  .label a {
+    text-decoration: none;
   }
 </style>

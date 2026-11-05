@@ -1,10 +1,10 @@
 ---
 title: YOMOGi-raiders
+statement: Gather. Build. Raid. Wipe.
 summary: ゲーム「Rust」の遊び方を Minecraft で再現する、Factions 型の PvP サーバー。拠点の保護・レイド・資源の仕組みを、自作のプラグインで作っています。
 started: 2026-10-10
 status: 運用中
 tags: [Java, Paper, Maven, Minecraft, データパック, Python, Bash, systemd]
-accent: '#b5562b'
 order: 10
 ---
 

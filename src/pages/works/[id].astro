@@ -2,8 +2,7 @@
 import type { GetStaticPaths } from 'astro';
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import Base from '../../layouts/Base.astro';
-import Cover from '../../components/Cover.astro';
-import { formatMonth, withBase } from '../../lib/site';
+import { formatMonth, formatStamp, withBase } from '../../lib/site';
 
 export const getStaticPaths = (async () => {
   const works = await getCollection('works', ({ data }) => !data.draft);
@@ -15,104 +14,131 @@ interface Props {
 }
 
 const { work } = Astro.props;
-const { title, summary, started, status, tags, accent, links } = work.data;
+const { title, statement, summary, started, status, tags, links } = work.data;
 const { Content } = await render(work);
+const wall = Array.from({ length: 10 }, () => [title, ...tags].join(' ')).join(' ');
 ---
 
 <Base title={title} description={summary}>
-  <div class="cover-band">
-    <Cover seed={work.id} accent={accent} cols={24} rows={5} />
-  </div>
-
-  <article class="container">
-    <a class="back" href={withBase('/#works')}>← 作品一覧</a>
-
-    <header>
-      <h1>{title}</h1>
-      <p class="summary">{summary}</p>
-    </header>
-
-    <dl class="facts">
+  <section class="sec tone-light head">
+    <div class="container sec-inner">
+      <p class="sec-label">作品</p>
       <div>
-        <dt>状態</dt>
-        <dd><span class="status" data-status={status}>{status}</span></dd>
+        <a class="back label" href={withBase('/#works')}>← Works</a>
+        <p class="stamp label">WORK_{formatStamp(started)}</p>
+        <h1 class="display" data-reveal>{title}</h1>
+        {statement && <p class="statement" data-reveal>{statement}</p>}
+        <p class="summary mincho" data-reveal>{summary}</p>
       </div>
-      <div>
-        <dt>開始</dt>
-        <dd>{formatMonth(started)}</dd>
-      </div>
-      <div class="wide">
-        <dt>使ったもの</dt>
-        <dd>
-          <ul class="tags">
-            {tags.map((tag) => <li>{tag}</li>)}
-          </ul>
-        </dd>
-      </div>
-      {
-        links.length > 0 && (
-          <div class="wide">
-            <dt>リンク</dt>
-            <dd class="links">
-              {links.map((link) => (
-                <a href={link.href}>{link.label} ↗</a>
-              ))}
-            </dd>
-          </div>
-        )
-      }
-    </dl>
-
-    <div class="prose">
-      <Content />
     </div>
-  </article>
+  </section>
+
+  <section class="sec tone-dark facts-band">
+    <p class="wall" aria-hidden="true">{wall}</p>
+    <div class="container sec-inner">
+      <p class="sec-label">概要</p>
+      <dl class="facts">
+        <div>
+          <dt class="label">Status</dt>
+          <dd><span class="status" data-status={status}>{status}</span></dd>
+        </div>
+        <div>
+          <dt class="label">Since</dt>
+          <dd>{formatMonth(started)}</dd>
+        </div>
+        <div class="wide">
+          <dt class="label">Built with</dt>
+          <dd>
+            <ul class="tags">
+              {tags.map((tag) => <li>{tag}</li>)}
+            </ul>
+          </dd>
+        </div>
+        {
+          links.length > 0 && (
+            <div class="wide">
+              <dt class="label">Links</dt>
+              <dd class="links">
+                {links.map((link) => (
+                  <a href={link.href}>{link.label} ↗</a>
+                ))}
+              </dd>
+            </div>
+          )
+        }
+      </dl>
+    </div>
+  </section>
+
+  <section class="sec tone-light body">
+    <div class="container sec-inner">
+      <p class="sec-label">詳細</p>
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </section>
 </Base>
 
 <style>
-  .cover-band {
-    height: clamp(90px, 16vw, 160px);
-    border-bottom: 1px solid var(--line);
+  .head {
+    padding: 56px 0 120px;
   }
 
   .back {
     display: inline-block;
-    margin-top: 28px;
-    color: var(--muted);
-    font-size: 0.9rem;
+    margin-bottom: 72px;
+    color: var(--sub);
     text-decoration: none;
   }
 
   .back:hover {
-    color: var(--text);
+    color: var(--fg);
   }
 
-  header {
-    margin: 20px 0 28px;
+  .stamp {
+    margin: 0 0 20px;
+    color: var(--sub);
   }
 
   h1 {
     margin: 0;
-    font-size: clamp(1.7rem, 5vw, 2.4rem);
-    line-height: 1.35;
+    font-size: clamp(48px, 11vw, 160px);
+  }
+
+  .statement {
+    margin: 24px 0 0;
+    font-family: var(--font-display);
+    font-size: clamp(20px, 3vw, 32px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
   }
 
   .summary {
-    max-width: 40em;
-    margin: 12px 0 0;
-    color: var(--muted);
-    font-size: 1.05rem;
+    max-width: 30em;
+    margin: 48px 0 0;
+    font-size: clamp(16px, 2vw, 19px);
+    line-height: 2.1;
+  }
+
+  .facts-band {
+    overflow: hidden;
+    padding: 96px 0;
   }
 
   .facts {
+    position: relative;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 16px 24px;
-    margin: 0 0 8px;
-    padding: 20px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    background: var(--surface);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 40px 32px;
+    margin: 0;
+  }
+
+  @media (min-width: 820px) {
+    .facts {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
   }
 
   .facts .wide {
@@ -120,18 +146,27 @@ const { Content } = await render(work);
   }
 
   dt {
-    margin-bottom: 4px;
-    color: var(--muted);
-    font-size: 0.8rem;
+    margin-bottom: 10px;
+    color: var(--sub);
   }
 
   dd {
     margin: 0;
+    font-size: 17px;
+  }
+
+  .facts .tags {
+    color: var(--fg);
+    font-size: 15px;
   }
 
   .links {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 24px;
+  }
+
+  .body {
+    padding: 40px 0 140px;
   }
 </style>
