@@ -10,7 +10,7 @@ statement: student
 # 載せたいリンク。いらない行は消し、増やすときは同じ形で行を足す
 links:
   - { label: GitHub, href: 'https://github.com/Ragazzo249' }
-  - { label: よもぎサーバー, href: 'https://ymg24.org/' }
+  - { label: よもぎサーバー, href: 'https://www.ymg24.org/' }
 # 書き終わったら false にすると、サイトに表示される
 draft: false
 ---
