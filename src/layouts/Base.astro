@@ -60,8 +60,8 @@ const aboutDraft = Boolean(aboutFrontmatter.draft);
       <div class="container inner">
         <a class="brand display" href={withBase('/')}>{SITE.title}</a>
         <nav class="label">
-          <a href={withBase('/#works')}>Works</a>
           {!aboutDraft && <a href={withBase('/#about')}>About</a>}
+          <a href={withBase('/#works')}>Works</a>
           <a href={SITE.github} rel="me">GitHub</a>
         </nav>
       </div>
